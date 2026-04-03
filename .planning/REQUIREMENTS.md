@@ -91,34 +91,34 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | — | Pending |
-| AUTH-02 | — | Pending |
-| AUTH-03 | — | Pending |
-| AUTH-04 | — | Pending |
-| MSG-01 | — | Pending |
-| MSG-02 | — | Pending |
-| MSG-03 | — | Pending |
-| MSG-04 | — | Pending |
-| MSG-05 | — | Pending |
-| MSG-06 | — | Pending |
-| MSG-07 | — | Pending |
-| TASK-01 | — | Pending |
-| TASK-02 | — | Pending |
-| TASK-03 | — | Pending |
-| TASK-04 | — | Pending |
-| TASK-05 | — | Pending |
-| LOC-01 | — | Pending |
-| LOC-02 | — | Pending |
-| LOC-03 | — | Pending |
-| LOC-04 | — | Pending |
-| NAV-01 | — | Pending |
-| NAV-02 | — | Pending |
+| AUTH-01 | Phase 1 | Pending |
+| AUTH-02 | Phase 1 | Pending |
+| AUTH-03 | Phase 1 | Pending |
+| AUTH-04 | Phase 1 | Pending |
+| NAV-01 | Phase 1 | Pending |
+| NAV-02 | Phase 1 | Pending |
+| MSG-01 | Phase 2 | Pending |
+| MSG-02 | Phase 2 | Pending |
+| MSG-03 | Phase 2 | Pending |
+| MSG-04 | Phase 2 | Pending |
+| MSG-05 | Phase 2 | Pending |
+| MSG-06 | Phase 2 | Pending |
+| MSG-07 | Phase 2 | Pending |
+| LOC-01 | Phase 3 | Pending |
+| LOC-02 | Phase 3 | Pending |
+| LOC-03 | Phase 3 | Pending |
+| LOC-04 | Phase 3 | Pending |
+| TASK-01 | Phase 4 | Pending |
+| TASK-02 | Phase 4 | Pending |
+| TASK-03 | Phase 4 | Pending |
+| TASK-04 | Phase 4 | Pending |
+| TASK-05 | Phase 4 | Pending |
 
 **Coverage:**
 - v1 requirements: 22 total
-- Mapped to phases: 0
-- Unmapped: 22
+- Mapped to phases: 22
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-03*
-*Last updated: 2026-04-03 after initial definition*
+*Last updated: 2026-04-03 — traceability populated after roadmap creation*
