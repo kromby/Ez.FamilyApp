@@ -33,7 +33,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-01-PLAN.md — Azure SQL schema + Express API (auth, families, users)
-- [ ] 01-02-PLAN.md — Expo bootstrap, design tokens, session store, root layout
+- [x] 01-02-PLAN.md — Expo bootstrap, design tokens, session store, root layout
 - [ ] 01-03-PLAN.md — Auth/onboarding screens (welcome through set-name) + API client
 - [ ] 01-04-PLAN.md — 5-tab shell and all tab screens (Home, Messages, Tasks, Location, Profile)
 
@@ -82,7 +82,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 1/4 | In Progress|  |
+| 1. Foundation | 2/4 | In Progress|  |
 | 2. Messaging | 0/? | Not started | - |
 | 3. Location | 0/? | Not started | - |
 | 4. Tasks | 0/? | Not started | - |
