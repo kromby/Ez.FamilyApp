@@ -9,10 +9,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Authentication & Onboarding
 
-- [ ] **AUTH-01**: User can create a new family and receive a family code
-- [ ] **AUTH-02**: User can join an existing family by entering a family code
-- [ ] **AUTH-03**: User can set a display name during signup
-- [ ] **AUTH-04**: User session persists across app restarts
+- [x] **AUTH-01**: User can create a new family and receive a family code
+- [x] **AUTH-02**: User can join an existing family by entering a family code
+- [x] **AUTH-03**: User can set a display name during signup
+- [x] **AUTH-04**: User session persists across app restarts
 
 ### Messaging
 
@@ -91,10 +91,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1 | Pending |
-| AUTH-02 | Phase 1 | Pending |
-| AUTH-03 | Phase 1 | Pending |
-| AUTH-04 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Complete |
+| AUTH-02 | Phase 1 | Complete |
+| AUTH-03 | Phase 1 | Complete |
+| AUTH-04 | Phase 1 | Complete |
 | NAV-01 | Phase 1 | Pending |
 | NAV-02 | Phase 1 | Pending |
 | MSG-01 | Phase 2 | Pending |
