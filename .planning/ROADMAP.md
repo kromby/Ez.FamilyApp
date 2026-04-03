@@ -29,7 +29,14 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can set a display name during signup and see it displayed in the app
   4. User reopens the app after closing it and is still logged in (session persists)
   5. App shows tab-based navigation with messages, tasks, location, and profile tabs
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Azure SQL schema + Express API (auth, families, users)
+- [ ] 01-02-PLAN.md — Expo bootstrap, design tokens, session store, root layout
+- [ ] 01-03-PLAN.md — Auth/onboarding screens (welcome through set-name) + API client
+- [ ] 01-04-PLAN.md — 5-tab shell and all tab screens (Home, Messages, Tasks, Location, Profile)
+
 **UI hint**: yes
 
 ### Phase 2: Messaging
@@ -75,7 +82,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/? | Not started | - |
+| 1. Foundation | 0/4 | Not started | - |
 | 2. Messaging | 0/? | Not started | - |
 | 3. Location | 0/? | Not started | - |
 | 4. Tasks | 0/? | Not started | - |
