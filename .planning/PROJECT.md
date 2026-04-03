@@ -41,8 +41,9 @@ Family members can stay connected and coordinated through one app that replaces 
 
 ## Constraints
 
-- **Platform**: React Native or Flutter — must support both iOS and Android from one codebase
-- **Backend**: Needs real-time messaging capability (WebSockets or similar)
+- **Platform**: React Native (Expo) — must support both iOS and Android from one codebase
+- **Backend**: Azure-native services (Azure SQL, Azure SignalR, Azure Functions / App Service)
+- **Infrastructure**: All backend hosted on Azure — no third-party BaaS (Supabase, Firebase, etc.)
 - **Privacy**: All data is family-private, no public profiles or discovery
 
 ## Key Decisions
@@ -53,6 +54,7 @@ Family members can stay connected and coordinated through one app that replaces 
 | Check-in over live location | Simpler, better privacy, no battery drain | — Pending |
 | Family code over invite links | Simpler onboarding, code can be shared verbally | — Pending |
 | Shared lists over assignable tasks | Keep v1 simple, assignment adds complexity | — Pending |
+| Azure-native backend over Supabase | User requires Azure infrastructure — use Azure SQL, SignalR, Functions | — Pending |
 
 ## Evolution
 
@@ -72,4 +74,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-03 after initialization*
+*Last updated: 2026-04-03 after Azure backend decision*
