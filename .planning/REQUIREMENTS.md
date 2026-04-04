@@ -42,7 +42,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Navigation & Shell
 
 - [x] **NAV-01**: App has tab-based navigation (messages, tasks, location, profile)
-- [ ] **NAV-02**: App shows which family the user belongs to
+- [x] **NAV-02**: App shows which family the user belongs to
 
 ## v2 Requirements
 
@@ -96,7 +96,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTH-03 | Phase 1 | Complete |
 | AUTH-04 | Phase 1 | Complete |
 | NAV-01 | Phase 1 | Complete |
-| NAV-02 | Phase 1 | Pending |
+| NAV-02 | Phase 1 | Complete |
 | MSG-01 | Phase 2 | Pending |
 | MSG-02 | Phase 2 | Pending |
 | MSG-03 | Phase 2 | Pending |

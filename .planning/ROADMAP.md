@@ -35,7 +35,7 @@ Plans:
 - [x] 01-01-PLAN.md — Azure SQL schema + Express API (auth, families, users)
 - [x] 01-02-PLAN.md — Expo bootstrap, design tokens, session store, root layout
 - [x] 01-03-PLAN.md — Auth/onboarding screens (welcome through set-name) + API client
-- [ ] 01-04-PLAN.md — 5-tab shell and all tab screens (Home, Messages, Tasks, Location, Profile)
+- [x] 01-04-PLAN.md — 5-tab shell and all tab screens (Home, Messages, Tasks, Location, Profile)
 
 **UI hint**: yes
 
