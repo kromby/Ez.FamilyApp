@@ -12,15 +12,14 @@ Family members can stay connected and coordinated through one app that replaces 
 
 ### Validated
 
-(None yet — ship to validate)
+- ✓ Family code signup (creator sets up family, members join via a shared code) — Phase 1
+- ✓ Cross-platform mobile (iOS and Android) — Phase 1 (Expo bootstrap)
 
 ### Active
 
 - [ ] Channel-based messaging (multiple topic channels like groceries, planning, random)
 - [ ] Location check-ins (tap to share current location as a snapshot)
 - [ ] Shared task lists (family to-do lists anyone can add to and check off)
-- [ ] Family code signup (creator sets up family, members join via a shared code)
-- [ ] Cross-platform mobile (iOS and Android)
 
 ### Out of Scope
 
@@ -74,4 +73,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-03 after Azure backend decision*
+*Last updated: 2026-04-04 after Phase 1 completion*
