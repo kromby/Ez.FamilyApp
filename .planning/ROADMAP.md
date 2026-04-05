@@ -49,7 +49,15 @@ Plans:
   3. User sends a text message and it appears instantly for other family members (real-time delivery)
   4. User opens a channel and sees message history from previous sessions, with each message showing sender name and timestamp
   5. User can react to a message with an emoji and other family members see the reaction
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — DB schema extensions + Channel API + test infrastructure + npm installs
+- [ ] 02-02-PLAN.md — Message API routes + SignalR backend (negotiate, broadcast, groups)
+- [ ] 02-03-PLAN.md — Frontend navigation conversion + channel list + create channel modal
+- [ ] 02-04-PLAN.md — Message thread screen + SignalR client hook + optimistic sends
+- [ ] 02-05-PLAN.md — Emoji reactions (backend + frontend) + human verification checkpoint
+
 **UI hint**: yes
 
 ### Phase 3: Location
@@ -82,7 +90,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 2/4 | In Progress|  |
-| 2. Messaging | 0/? | Not started | - |
+| 1. Foundation | 4/4 | Complete |  |
+| 2. Messaging | 0/5 | Planned | - |
 | 3. Location | 0/? | Not started | - |
 | 4. Tasks | 0/? | Not started | - |
