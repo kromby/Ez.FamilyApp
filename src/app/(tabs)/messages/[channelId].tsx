@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect, useMemo } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import {
   View, Text, StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator,
 } from 'react-native';
@@ -8,11 +8,13 @@ import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSession } from '../../../stores/session';
 import { useThemeColors, Spacing, Typography } from '../../../constants/theme';
-import { fetchMessages, sendMessage, Message } from '../../../lib/api';
+import { fetchMessages, sendMessage, toggleReaction, Message } from '../../../lib/api';
 import { useMessagingStore } from '../../../stores/messaging';
 import { useSignalR } from '../../../hooks/useSignalR';
 import { MessageBubble } from '../../../components/messages/MessageBubble';
 import { MessageInput } from '../../../components/messages/MessageInput';
+import { ReactionPicker } from '../../../components/messages/ReactionPicker';
+import { ReactionChips } from '../../../components/messages/ReactionChips';
 
 const GROUPING_THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes per UI-SPEC
 
@@ -23,6 +25,7 @@ export default function MessageThreadScreen() {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const connectionStatus = useMessagingStore((s) => s.connectionStatus);
+  const [pickerMessageId, setPickerMessageId] = useState<string | null>(null);
 
   // Initialize SignalR connection (singleton — will connect once per session)
   useSignalR();
@@ -129,12 +132,42 @@ export default function MessageThreadScreen() {
     sendMutation.mutate(text);
   }, [sendMutation]);
 
+  const handleToggleReaction = useCallback(async (messageId: string, emoji: string) => {
+    setPickerMessageId(null);
+    try {
+      const result = await toggleReaction(token!, messageId, emoji);
+      // Cache will be updated via SignalR ReceiveReaction event
+      // But also update locally for immediate feedback
+      queryClient.setQueryData(['messages', channelId], (old: any) => {
+        if (!old?.pages) return old;
+        return {
+          ...old,
+          pages: old.pages.map((page: any) => ({
+            ...page,
+            messages: page.messages.map((m: Message) =>
+              m.id === messageId ? { ...m, reactions: result.reactions } : m
+            ),
+          })),
+        };
+      });
+    } catch (err) {
+      console.error('Failed to toggle reaction:', err);
+    }
+  }, [token, channelId, queryClient]);
+
   const renderItem = useCallback(({ item, index }: { item: Message; index: number }) => (
     <MessageBubble
       message={item}
       isFirstInGroup={getIsFirstInGroup(index)}
-    />
-  ), [getIsFirstInGroup]);
+      onLongPress={() => setPickerMessageId(item.id)}
+    >
+      <ReactionChips
+        reactions={item.reactions || []}
+        currentUserId={user!.id}
+        onToggle={(emoji) => handleToggleReaction(item.id, emoji)}
+      />
+    </MessageBubble>
+  ), [getIsFirstInGroup, user, handleToggleReaction]);
 
   // Load more on scroll to top (infinite scroll upward)
   const handleEndReached = useCallback(() => {
@@ -190,6 +223,13 @@ export default function MessageThreadScreen() {
 
       {/* Message input */}
       <MessageInput channelName={channelName} onSend={handleSend} />
+
+      {/* Reaction picker (long-press trigger) */}
+      <ReactionPicker
+        visible={!!pickerMessageId}
+        onSelect={(emoji) => pickerMessageId && handleToggleReaction(pickerMessageId, emoji)}
+        onDismiss={() => setPickerMessageId(null)}
+      />
     </KeyboardAvoidingView>
   );
 }
