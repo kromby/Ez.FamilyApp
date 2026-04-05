@@ -2,7 +2,7 @@ import { Router, Response } from 'express';
 import sql from 'mssql';
 import { getPool } from '../db/connection';
 import { authenticate, AuthRequest } from '../middleware/authenticate';
-import { broadcastToChannel } from '../lib/signalr';
+import { broadcastToChannel, broadcastReaction } from '../lib/signalr';
 
 export const messagesRouter = Router();
 
@@ -142,6 +142,41 @@ messagesRouter.get('/', authenticate, async (req: AuthRequest, res: Response): P
     const result = await request.query(query);
     const messages = result.recordset;
 
+    // Fetch reactions for all messages in this page
+    if (messages.length > 0) {
+      const messageIds = messages.map((m: any) => m.id);
+      // Build dynamic query for message IDs
+      const idPlaceholders = messageIds.map((_: any, i: number) => `@mid${i}`).join(',');
+      const reactionsReq = pool.request();
+      messageIds.forEach((id: string, i: number) => {
+        reactionsReq.input(`mid${i}`, sql.UniqueIdentifier, id);
+      });
+
+      const reactionsResult = await reactionsReq.query(`
+        SELECT message_id AS messageId, emoji, COUNT(*) AS count,
+          STRING_AGG(CAST(user_id AS NVARCHAR(36)), ',') AS userIds
+        FROM message_reactions
+        WHERE message_id IN (${idPlaceholders})
+        GROUP BY message_id, emoji
+      `);
+
+      // Group reactions by messageId
+      const reactionsByMessage: Record<string, any[]> = {};
+      for (const r of reactionsResult.recordset) {
+        if (!reactionsByMessage[r.messageId]) reactionsByMessage[r.messageId] = [];
+        reactionsByMessage[r.messageId].push({
+          emoji: r.emoji,
+          count: r.count,
+          userIds: r.userIds.split(','),
+        });
+      }
+
+      // Attach reactions to messages
+      for (const msg of messages) {
+        (msg as any).reactions = reactionsByMessage[msg.id] || [];
+      }
+    }
+
     // Determine if there are more older messages
     const hasMore = messages.length === pageSize;
     const nextCursor = hasMore && messages.length > 0
@@ -152,5 +187,85 @@ messagesRouter.get('/', authenticate, async (req: AuthRequest, res: Response): P
   } catch (err) {
     console.error('GET /messages error:', err);
     res.status(500).json({ error: 'Failed to fetch messages' });
+  }
+});
+
+// POST /messages/:messageId/reactions — toggle a reaction (D-12, D-14, Pitfall 5)
+messagesRouter.post('/:messageId/reactions', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
+  const { messageId } = req.params;
+  const { emoji } = req.body;
+
+  const allowedEmojis = ['\uD83D\uDC4D', '\u2764\uFE0F', '\uD83D\uDE02', '\uD83D\uDE2E', '\uD83D\uDE22', '\uD83D\uDE21'];
+  // That's: thumbs-up, heart, laugh, surprised, sad, angry
+
+  if (!emoji || !allowedEmojis.includes(emoji)) {
+    res.status(400).json({ error: 'Invalid emoji. Must be one of the allowed reactions.' });
+    return;
+  }
+
+  try {
+    const pool = await getPool();
+
+    // Check if reaction already exists
+    const existing = await pool.request()
+      .input('messageId', sql.UniqueIdentifier, messageId)
+      .input('userId', sql.UniqueIdentifier, req.userId)
+      .input('emoji', sql.NVarChar, emoji)
+      .query('SELECT id FROM message_reactions WHERE message_id = @messageId AND user_id = @userId AND emoji = @emoji');
+
+    let action: 'added' | 'removed';
+
+    if (existing.recordset.length > 0) {
+      // Remove existing reaction
+      await pool.request()
+        .input('messageId', sql.UniqueIdentifier, messageId)
+        .input('userId', sql.UniqueIdentifier, req.userId)
+        .input('emoji', sql.NVarChar, emoji)
+        .query('DELETE FROM message_reactions WHERE message_id = @messageId AND user_id = @userId AND emoji = @emoji');
+      action = 'removed';
+    } else {
+      // Add new reaction
+      await pool.request()
+        .input('messageId', sql.UniqueIdentifier, messageId)
+        .input('userId', sql.UniqueIdentifier, req.userId)
+        .input('emoji', sql.NVarChar, emoji)
+        .query('INSERT INTO message_reactions (message_id, user_id, emoji) VALUES (@messageId, @userId, @emoji)');
+      action = 'added';
+    }
+
+    // Fetch updated reaction aggregates for this message
+    const reactionsResult = await pool.request()
+      .input('messageId2', sql.UniqueIdentifier, messageId)
+      .query(`
+        SELECT emoji, COUNT(*) AS count,
+          STRING_AGG(CAST(user_id AS NVARCHAR(36)), ',') AS userIds
+        FROM message_reactions
+        WHERE message_id = @messageId2
+        GROUP BY emoji
+      `);
+
+    const reactions = reactionsResult.recordset.map((r: any) => ({
+      emoji: r.emoji,
+      count: r.count,
+      userIds: r.userIds.split(','),
+    }));
+
+    // Get channelId for broadcast
+    const msgResult = await pool.request()
+      .input('messageId3', sql.UniqueIdentifier, messageId)
+      .query('SELECT channel_id FROM messages WHERE id = @messageId3');
+
+    const channelId = msgResult.recordset[0]?.channel_id;
+
+    if (channelId) {
+      broadcastReaction(channelId, { channelId, messageId, reactions }).catch((err) => {
+        console.error('SignalR reaction broadcast failed:', err);
+      });
+    }
+
+    res.json({ action, reactions });
+  } catch (err) {
+    console.error('POST /messages/:messageId/reactions error:', err);
+    res.status(500).json({ error: 'Failed to toggle reaction' });
   }
 });
