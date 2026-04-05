@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-04-05T20:09:30.240Z"
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-04-05T20:11:56.937Z"
 last_activity: 2026-04-05
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 9
-  completed_plans: 5
+  completed_plans: 6
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-03)
 ## Current Position
 
 Phase: 02 (messaging) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-04-05
 
@@ -57,6 +57,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01-foundation P03 | 3min | 2 tasks | 8 files |
 | Phase 01-foundation P04 | 2min | 2 tasks | 6 files |
 | Phase 02-messaging P01 | 2 | 2 tasks | 10 files |
+| Phase 02-messaging P02 | 5 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,8 @@ Recent decisions affecting current work:
 - [Phase 01-foundation]: Phase 1 Home tab shows only current user avatar; full member list deferred to Phase 2 API
 - [Phase 02-messaging]: Channel name validation uses /^[a-zA-Z0-9 \-]{1,50}$/ pattern; duplicate check is case-insensitive via LOWER(name)
 - [Phase 02-messaging]: #general channel uses @familyId2 param to avoid mssql duplicate input binding in same pool handler
+- [Phase 02-messaging]: SignalR broadcast is fire-and-forget after SQL persist — broadcast failure does not roll back the message (D-09 persist-first)
+- [Phase 02-messaging]: Cursor-based pagination uses created_at timestamp as keyset cursor — consistent performance as history grows (D-11)
 
 ### Pending Todos
 
@@ -91,6 +94,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T20:09:30.237Z
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-04-05T20:11:56.935Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None

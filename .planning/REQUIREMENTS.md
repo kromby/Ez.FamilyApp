@@ -18,10 +18,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **MSG-01**: User can view a list of channels in their family
 - [x] **MSG-02**: User can create a new channel with a name
-- [ ] **MSG-03**: User can send a text message in a channel
-- [ ] **MSG-04**: User can see messages from other family members in real-time
-- [ ] **MSG-05**: Message history persists and loads when opening a channel
-- [ ] **MSG-06**: Messages display sender name and timestamp
+- [x] **MSG-03**: User can send a text message in a channel
+- [x] **MSG-04**: User can see messages from other family members in real-time
+- [x] **MSG-05**: Message history persists and loads when opening a channel
+- [x] **MSG-06**: Messages display sender name and timestamp
 - [ ] **MSG-07**: User can react to a message with an emoji
 
 ### Tasks
@@ -99,10 +99,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | NAV-02 | Phase 1 | Complete |
 | MSG-01 | Phase 2 | Complete |
 | MSG-02 | Phase 2 | Complete |
-| MSG-03 | Phase 2 | Pending |
-| MSG-04 | Phase 2 | Pending |
-| MSG-05 | Phase 2 | Pending |
-| MSG-06 | Phase 2 | Pending |
+| MSG-03 | Phase 2 | Complete |
+| MSG-04 | Phase 2 | Complete |
+| MSG-05 | Phase 2 | Complete |
+| MSG-06 | Phase 2 | Complete |
 | MSG-07 | Phase 2 | Pending |
 | LOC-01 | Phase 3 | Pending |
 | LOC-02 | Phase 3 | Pending |
