@@ -56,6 +56,15 @@ familiesRouter.post('/', authenticate, async (req: AuthRequest, res: Response): 
       .input('userId', sql.UniqueIdentifier, req.userId)
       .query('UPDATE users SET family_id = @familyId WHERE id = @userId');
 
+    // D-03: Auto-create #general channel for every new family
+    await pool.request()
+      .input('familyId2', sql.UniqueIdentifier, familyId)
+      .input('createdBy', sql.UniqueIdentifier, req.userId)
+      .query(`
+        INSERT INTO channels (family_id, name, created_by)
+        VALUES (@familyId2, 'general', @createdBy)
+      `);
+
     res.json({ familyId, code });
   } catch (err) {
     console.error('POST /families error:', err);

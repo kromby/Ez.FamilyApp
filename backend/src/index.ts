@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import { authRouter } from './routes/auth';
 import { familiesRouter } from './routes/families';
 import { usersRouter } from './routes/users';
+import { channelsRouter } from './routes/channels';
 import { getPool } from './db/connection';
 
 const app = express();
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use('/auth', authRouter);
 app.use('/families', familiesRouter);
 app.use('/users', usersRouter);
+app.use('/channels', channelsRouter);
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
