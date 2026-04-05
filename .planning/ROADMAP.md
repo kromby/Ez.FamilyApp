@@ -54,7 +54,7 @@ Plans:
 Plans:
 - [x] 02-01-PLAN.md — DB schema extensions + Channel API + test infrastructure + npm installs
 - [x] 02-02-PLAN.md — Message API routes + SignalR backend (negotiate, broadcast, groups)
-- [ ] 02-03-PLAN.md — Frontend navigation conversion + channel list + create channel modal
+- [x] 02-03-PLAN.md — Frontend navigation conversion + channel list + create channel modal
 - [ ] 02-04-PLAN.md — Message thread screen + SignalR client hook + optimistic sends
 - [ ] 02-05-PLAN.md — Emoji reactions (backend + frontend) + human verification checkpoint
 
@@ -91,6 +91,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete |  |
-| 2. Messaging | 1/5 | In Progress|  |
+| 2. Messaging | 3/5 | In Progress|  |
 | 3. Location | 0/? | Not started | - |
 | 4. Tasks | 0/? | Not started | - |
