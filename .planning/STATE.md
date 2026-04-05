@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-03-PLAN.md
-last_updated: "2026-04-05T20:14:58.098Z"
+stopped_at: Completed 02-04-PLAN.md
+last_updated: "2026-04-05T20:18:00.209Z"
 last_activity: 2026-04-05
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 9
-  completed_plans: 7
+  completed_plans: 8
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-03)
 ## Current Position
 
 Phase: 02 (messaging) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-04-05
 
@@ -59,6 +59,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 02-messaging P01 | 2 | 2 tasks | 10 files |
 | Phase 02-messaging P02 | 5 | 2 tasks | 4 files |
 | Phase 02-messaging P03 | 5 | 2 tasks | 5 files |
+| Phase 02-messaging P04 | 4min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -86,6 +87,8 @@ Recent decisions affecting current work:
 - [Phase 02-messaging]: messages.tsx placeholder deleted — Expo Router resolves messages/ directory index automatically
 - [Phase 02-messaging]: headerShown: false on messages tab prevents double header when Stack navigator is nested in Tab
 - [Phase 02-messaging]: API client centralized in src/lib/api.ts with apiFetch helper for auth header injection
+- [Phase 02-messaging]: useSignalR called in thread screen with one HubConnection per session managed via token dependency
+- [Phase 02-messaging]: Optimistic messages marked error on failure (not rolled back) so user sees failed message
 
 ### Pending Todos
 
@@ -98,6 +101,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T20:14:58.096Z
-Stopped at: Completed 02-03-PLAN.md
+Last session: 2026-04-05T20:18:00.206Z
+Stopped at: Completed 02-04-PLAN.md
 Resume file: None
