@@ -1,0 +1,210 @@
+import React, { useCallback, useLayoutEffect, useMemo } from 'react';
+import {
+  View, Text, StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator,
+} from 'react-native';
+import { FlashList } from '@shopify/flash-list';
+import { Ionicons } from '@expo/vector-icons';
+import { useLocalSearchParams, useNavigation } from 'expo-router';
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSession } from '../../../stores/session';
+import { useThemeColors, Spacing, Typography } from '../../../constants/theme';
+import { fetchMessages, sendMessage, Message } from '../../../lib/api';
+import { useMessagingStore } from '../../../stores/messaging';
+import { useSignalR } from '../../../hooks/useSignalR';
+import { MessageBubble } from '../../../components/messages/MessageBubble';
+import { MessageInput } from '../../../components/messages/MessageInput';
+
+const GROUPING_THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes per UI-SPEC
+
+export default function MessageThreadScreen() {
+  const { channelId } = useLocalSearchParams<{ channelId: string }>();
+  const { session: token, user } = useSession();
+  const colors = useThemeColors();
+  const navigation = useNavigation();
+  const queryClient = useQueryClient();
+  const connectionStatus = useMessagingStore((s) => s.connectionStatus);
+
+  // Initialize SignalR connection (singleton — will connect once per session)
+  useSignalR();
+
+  // Set header title to #channelName
+  // We'll get the channel name from the channel list cache or fallback to ID
+  const channelData = queryClient.getQueryData<{ channels: any[] }>(['channels']);
+  const channel = channelData?.channels?.find((c: any) => c.id === channelId);
+  const channelName = channel?.name || 'channel';
+
+  useLayoutEffect(() => {
+    navigation.setOptions({ title: `#${channelName}` });
+  }, [navigation, channelName]);
+
+  // Fetch message history with cursor pagination (D-11)
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+  } = useInfiniteQuery({
+    queryKey: ['messages', channelId],
+    queryFn: ({ pageParam }) => fetchMessages(token!, channelId!, pageParam),
+    initialPageParam: null as string | null,
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    enabled: !!token && !!channelId,
+  });
+
+  // Flatten pages into single message array (newest first, since API returns DESC)
+  const messages = useMemo(() => {
+    if (!data?.pages) return [];
+    return data.pages.flatMap((page) => page.messages);
+  }, [data]);
+
+  // Determine sender grouping
+  const getIsFirstInGroup = useCallback((index: number): boolean => {
+    if (index === messages.length - 1) return true; // oldest message = always first
+    // FlashList inverted: index 0 is newest. "Previous" message visually above is index+1
+    const current = messages[index];
+    const previous = messages[index + 1];
+    if (!previous) return true;
+    if (current.senderId !== previous.senderId) return true;
+    const currentTime = new Date(current.createdAt).getTime();
+    const previousTime = new Date(previous.createdAt).getTime();
+    return Math.abs(currentTime - previousTime) > GROUPING_THRESHOLD_MS;
+  }, [messages]);
+
+  // Send message mutation with optimistic update (D-10, Pitfall 3 from RESEARCH.md)
+  const sendMutation = useMutation({
+    mutationFn: (text: string) => sendMessage(token!, channelId!, text),
+    onMutate: async (text) => {
+      await queryClient.cancelQueries({ queryKey: ['messages', channelId] });
+      const previousData = queryClient.getQueryData(['messages', channelId]);
+
+      const optimisticMessage: Message = {
+        id: `temp-${Date.now()}`,
+        channelId: channelId!,
+        senderId: user!.id,
+        senderName: user!.displayName,
+        text,
+        createdAt: new Date().toISOString(),
+        reactions: [],
+        status: 'sending',
+      };
+
+      queryClient.setQueryData(['messages', channelId], (old: any) => {
+        if (!old?.pages?.length) {
+          return { pages: [{ messages: [optimisticMessage], nextCursor: null, hasMore: false }], pageParams: [null] };
+        }
+        return {
+          ...old,
+          pages: [
+            { ...old.pages[0], messages: [optimisticMessage, ...old.pages[0].messages] },
+            ...old.pages.slice(1),
+          ],
+        };
+      });
+
+      return { previousData };
+    },
+    onError: (_err, _text, context) => {
+      // Mark as error instead of rolling back (so user sees the failed message)
+      queryClient.setQueryData(['messages', channelId], (old: any) => {
+        if (!old?.pages) return context?.previousData;
+        return {
+          ...old,
+          pages: old.pages.map((page: any) => ({
+            ...page,
+            messages: page.messages.map((m: Message) =>
+              m.id.startsWith('temp-') ? { ...m, status: 'error' as const } : m
+            ),
+          })),
+        };
+      });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['messages', channelId] });
+      queryClient.invalidateQueries({ queryKey: ['channels'] });
+    },
+  });
+
+  const handleSend = useCallback((text: string) => {
+    sendMutation.mutate(text);
+  }, [sendMutation]);
+
+  const renderItem = useCallback(({ item, index }: { item: Message; index: number }) => (
+    <MessageBubble
+      message={item}
+      isFirstInGroup={getIsFirstInGroup(index)}
+    />
+  ), [getIsFirstInGroup]);
+
+  // Load more on scroll to top (infinite scroll upward)
+  const handleEndReached = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  return (
+    <KeyboardAvoidingView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 88 : 0}
+    >
+      {/* Connection status banner */}
+      {(connectionStatus === 'reconnecting' || connectionStatus === 'disconnected') && (
+        <View style={[styles.statusBanner, { backgroundColor: colors.surface }]}>
+          <Text style={[Typography.label, { color: colors.textSecondary, textAlign: 'center' }]}>
+            Reconnecting...
+          </Text>
+        </View>
+      )}
+
+      {/* Message list */}
+      {isLoading ? (
+        <ActivityIndicator style={{ flex: 1 }} color={colors.accent} />
+      ) : messages.length === 0 ? (
+        <View style={styles.emptyState}>
+          <Ionicons name="chatbubble-outline" size={48} color={colors.textSecondary} />
+          <Text style={[Typography.heading, { color: colors.textPrimary, marginTop: Spacing.md, textAlign: 'center' }]}>
+            Start the conversation
+          </Text>
+          <Text style={[Typography.body, { color: colors.textSecondary, marginTop: Spacing.sm, textAlign: 'center' }]}>
+            Send the first message in #{channelName}.
+          </Text>
+        </View>
+      ) : (
+        <FlashList
+          data={messages}
+          renderItem={renderItem}
+          estimatedItemSize={60}
+          keyExtractor={(item) => item.id}
+          inverted
+          onEndReached={handleEndReached}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            isFetchingNextPage ? (
+              <ActivityIndicator style={{ padding: Spacing.md }} color={colors.accent} size="small" />
+            ) : null
+          }
+        />
+      )}
+
+      {/* Message input */}
+      <MessageInput channelName={channelName} onSend={handleSend} />
+    </KeyboardAvoidingView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  statusBanner: {
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: Spacing.md,
+  },
+});
