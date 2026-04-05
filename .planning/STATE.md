@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-04-PLAN.md
-last_updated: "2026-04-05T20:18:00.209Z"
+stopped_at: "Checkpoint 02-05 Task 3: awaiting human verify"
+last_updated: "2026-04-05T20:21:40.051Z"
 last_activity: 2026-04-05
 progress:
   total_phases: 4
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 9
-  completed_plans: 8
+  completed_plans: 9
   percent: 0
 ---
 
@@ -60,6 +60,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 02-messaging P02 | 5 | 2 tasks | 4 files |
 | Phase 02-messaging P03 | 5 | 2 tasks | 5 files |
 | Phase 02-messaging P04 | 4min | 2 tasks | 5 files |
+| Phase 02-messaging P05 | 2min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -89,6 +90,8 @@ Recent decisions affecting current work:
 - [Phase 02-messaging]: API client centralized in src/lib/api.ts with apiFetch helper for auth header injection
 - [Phase 02-messaging]: useSignalR called in thread screen with one HubConnection per session managed via token dependency
 - [Phase 02-messaging]: Optimistic messages marked error on failure (not rolled back) so user sees failed message
+- [Phase 02-messaging]: Emoji allowlist validated server-side against 6 unicode literals to prevent arbitrary emoji storage
+- [Phase 02-messaging]: Optimistic local cache update on chip/picker tap for instant feedback; SignalR ReceiveReaction handles cross-device sync
 
 ### Pending Todos
 
@@ -101,6 +104,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T20:18:00.206Z
-Stopped at: Completed 02-04-PLAN.md
+Last session: 2026-04-05T20:21:33.197Z
+Stopped at: Checkpoint 02-05 Task 3: awaiting human verify
 Resume file: None

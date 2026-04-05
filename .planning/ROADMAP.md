@@ -56,7 +56,7 @@ Plans:
 - [x] 02-02-PLAN.md — Message API routes + SignalR backend (negotiate, broadcast, groups)
 - [x] 02-03-PLAN.md — Frontend navigation conversion + channel list + create channel modal
 - [x] 02-04-PLAN.md — Message thread screen + SignalR client hook + optimistic sends
-- [ ] 02-05-PLAN.md — Emoji reactions (backend + frontend) + human verification checkpoint
+- [x] 02-05-PLAN.md — Emoji reactions (backend + frontend) + human verification checkpoint
 
 **UI hint**: yes
 
