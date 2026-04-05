@@ -47,6 +47,7 @@ export default function TabsLayout() {
         name="messages"
         options={{
           title: 'Messages',
+          headerShown: false,
           tabBarIcon: ({ focused, color }) => (
             <TabIcon name="chatbubbles-outline" activeName="chatbubbles" focused={focused} color={color} />
           ),
