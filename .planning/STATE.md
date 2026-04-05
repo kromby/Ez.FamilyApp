@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Phase 2 UI-SPEC approved
-last_updated: "2026-04-05T19:49:45.913Z"
-last_activity: 2026-04-04
+status: executing
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-04-05T20:09:30.240Z"
+last_activity: 2026-04-05
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
+  total_plans: 9
+  completed_plans: 5
   percent: 0
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-03)
 
 **Core value:** Family members can stay connected and coordinated through one app that replaces scattered group chats, location requests, and shared notes.
-**Current focus:** Phase 01 — foundation
+**Current focus:** Phase 02 — messaging
 
 ## Current Position
 
-Phase: 2
-Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-04-04
+Phase: 02 (messaging) — EXECUTING
+Plan: 2 of 5
+Status: Ready to execute
+Last activity: 2026-04-05
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -56,6 +56,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01-foundation P02 | 4min | 2 tasks | 6 files |
 | Phase 01-foundation P03 | 3min | 2 tasks | 8 files |
 | Phase 01-foundation P04 | 2min | 2 tasks | 6 files |
+| Phase 02-messaging P01 | 2 | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,8 @@ Recent decisions affecting current work:
 - [Phase 01-foundation]: set-name passes token+userId+displayName+familyId to share-code for signIn() without extra API call
 - [Phase 01-foundation]: Dynamic header title uses navigation.setOptions({ title: user?.familyName }) in useEffect — cleanest Expo Router pattern for per-screen header overrides
 - [Phase 01-foundation]: Phase 1 Home tab shows only current user avatar; full member list deferred to Phase 2 API
+- [Phase 02-messaging]: Channel name validation uses /^[a-zA-Z0-9 \-]{1,50}$/ pattern; duplicate check is case-insensitive via LOWER(name)
+- [Phase 02-messaging]: #general channel uses @familyId2 param to avoid mssql duplicate input binding in same pool handler
 
 ### Pending Todos
 
@@ -88,6 +91,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T19:49:45.910Z
-Stopped at: Phase 2 UI-SPEC approved
-Resume file: .planning/phases/02-messaging/02-UI-SPEC.md
+Last session: 2026-04-05T20:09:30.237Z
+Stopped at: Completed 02-01-PLAN.md
+Resume file: None

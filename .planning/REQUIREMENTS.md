@@ -16,8 +16,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Messaging
 
-- [ ] **MSG-01**: User can view a list of channels in their family
-- [ ] **MSG-02**: User can create a new channel with a name
+- [x] **MSG-01**: User can view a list of channels in their family
+- [x] **MSG-02**: User can create a new channel with a name
 - [ ] **MSG-03**: User can send a text message in a channel
 - [ ] **MSG-04**: User can see messages from other family members in real-time
 - [ ] **MSG-05**: Message history persists and loads when opening a channel
@@ -97,8 +97,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTH-04 | Phase 1 | Complete |
 | NAV-01 | Phase 1 | Complete |
 | NAV-02 | Phase 1 | Complete |
-| MSG-01 | Phase 2 | Pending |
-| MSG-02 | Phase 2 | Pending |
+| MSG-01 | Phase 2 | Complete |
+| MSG-02 | Phase 2 | Complete |
 | MSG-03 | Phase 2 | Pending |
 | MSG-04 | Phase 2 | Pending |
 | MSG-05 | Phase 2 | Pending |
