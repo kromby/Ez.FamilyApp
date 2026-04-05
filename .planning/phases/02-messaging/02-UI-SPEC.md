@@ -54,16 +54,18 @@ Source: src/constants/theme.ts Spacing (existing tokens, locked)
 
 All values from `src/constants/theme.ts` Typography object. No new sizes or weights for this phase.
 
+Two weights only: 400 (regular) and 700 (bold/emphasis). Weight 700 is used for headings, labels requiring emphasis, and unread channel names (D-04). No weight 600 in this phase.
+
 | Role | Size | Weight | Line Height | Usage in Phase 2 |
 |------|------|--------|-------------|-----------------|
-| Display | 28px | 600 (semibold) | 34px (1.21) | not used in this phase |
-| Heading | 20px | 600 (semibold) | 24px (1.2) | Channel name in nav header, modal title, screen header |
+| Display | 28px | 700 (bold) | 34px (1.21) | not used in this phase |
+| Heading | 20px | 700 (bold) | 24px (1.2) | Channel name in nav header, modal title, screen header, confirm button label |
 | Body | 16px | 400 (regular) | 24px (1.5) | Message text content, channel last-message preview snippet |
 | Label | 14px | 400 (regular) | 20px (1.43) | Sender name above message group, timestamp, reaction chip count, channel row metadata |
 
-Bold variant (weight 700): Used for unread channel names in the channel list (D-04). This is the only weight-700 usage in the phase — it is not a new token, it overrides fontWeight inline.
+Emphasis rule: whenever weight 700 is needed inline (unread channel names per D-04, sender name on first message in group), apply fontWeight: '700' directly — this is the single emphasis weight, not a new token.
 
-Source: src/constants/theme.ts Typography (existing tokens, locked). Weight 700 for unread channels is an inline override, not a new token.
+Source: src/constants/theme.ts Typography (existing tokens, locked). Weight collapsed to 400/700 only; semibold (600) removed from contract.
 
 ---
 
@@ -107,6 +109,8 @@ Source: src/constants/theme.ts Colors (existing tokens, locked)
 
 File: `src/app/(tabs)/messages/index.tsx`
 
+**Focal point:** The channel list itself is the primary focus. The eye lands on the channel name (Body 16px, textPrimary) as the dominant element in each row, with the last-message snippet (Label 14px, textSecondary) and timestamp as supporting information. Unread channels (weight 700 channel name) naturally draw attention first. The plus icon in the header is the sole interactive affordance outside the list.
+
 **Layout:**
 - Full-screen FlashList of channel rows
 - Header right: plus icon (Ionicons `add-outline`, size 24, color accent) — taps to open channel creation modal
@@ -141,7 +145,7 @@ File: `src/app/(tabs)/messages/[channelId].tsx`
 Flat layout (D-05 — no chat bubbles, Slack/Discord style):
 
 - **First message in a sender group:**
-  - Sender name (Label 14px, weight 600, textPrimary) on its own line
+  - Sender name (Label 14px, weight 700, textPrimary) on its own line
   - Timestamp (Label 14px, textSecondary) on same line as sender name, right-aligned or inline after name with Spacing.xs gap
   - Message text (Body 16px, weight 400, textPrimary) below sender row
   - Spacing.sm (8px) top margin from previous group
@@ -165,7 +169,7 @@ Flat layout (D-05 — no chat bubbles, Slack/Discord style):
 **Reaction chips (D-14):**
 - Appear below message text when reactions exist
 - Each chip: emoji + space + count (Label 14px, textPrimary)
-- Chip background: surface color; border: 1px border color; border-radius: 12px; padding: 2px 8px
+- Chip background: surface color; border: 1px border color; border-radius: 12px; padding: 4px 8px
 - Current user's chip (user has reacted): accent color border instead of default border color
 - Chips laid out in a horizontal row, wrapping if needed, Spacing.xs gap between chips
 - Tap chip → toggle own reaction (add if not reacted, remove if already reacted)
@@ -207,7 +211,7 @@ File: inline within `src/app/(tabs)/messages/index.tsx` using React Native Modal
 - TextInput for channel name: Body 16px; placeholder "e.g. weekend-plans"; border: 1px border color; border-radius: 8px; padding: Spacing.sm Spacing.md; max length: 50 characters
 - Validation: 1–50 characters, letters/numbers/spaces/hyphens only (regex: `/^[a-zA-Z0-9 -]{1,50}$/`)
 - Inline validation error below input (Label 14px, destructive color): "Channel name must be 1–50 characters. Letters, numbers, spaces, and hyphens only."
-- Confirm button: "Create Channel" — full width; accent background; white text; Heading 20px weight 600; height 48px; border-radius: 8px; disabled (surface background, textSecondary text) when input is empty or invalid
+- Confirm button: "Create Channel" — full width; accent background; white text; Heading 20px weight 700; height 48px; border-radius: 8px; disabled (surface background, textSecondary text) when input is empty or invalid
 - Cancel: "Cancel" text button below confirm; Label 14px; textSecondary color; Spacing.md top margin; centered
 - Dismiss: tap outside panel or Cancel button
 
