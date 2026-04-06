@@ -1,10 +1,8 @@
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SessionProvider, useSession } from '../stores/session';
-import { useLocationPermission } from '../hooks/useLocationPermission';
-import { LocationPermissionModal } from '../components/location/LocationPermissionModal';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -12,7 +10,8 @@ const queryClient = new QueryClient();
 
 function RootNavigator() {
   const { session, isLoading } = useSession();
-  const { shouldShowModal, requestPermission, dismissModal } = useLocationPermission();
+  const segments = useSegments();
+  const router = useRouter();
 
   useEffect(() => {
     if (!isLoading) {
@@ -20,24 +19,23 @@ function RootNavigator() {
     }
   }, [isLoading]);
 
+  useEffect(() => {
+    if (isLoading) return;
+
+    const inAuthGroup = segments[0] === '(auth)';
+
+    if (!session && !inAuthGroup) {
+      router.replace('/(auth)/welcome');
+    } else if (session && inAuthGroup) {
+      router.replace('/(tabs)');
+    }
+  }, [session, isLoading, segments]);
+
   return (
-    <>
-      <Stack>
-        <Stack.Protected guard={!!session}>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        </Stack.Protected>
-        <Stack.Protected guard={!session}>
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        </Stack.Protected>
-      </Stack>
-      {session && (
-        <LocationPermissionModal
-          visible={shouldShowModal}
-          onAllow={requestPermission}
-          onDismiss={dismissModal}
-        />
-      )}
-    </>
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="(auth)" />
+    </Stack>
   );
 }
 

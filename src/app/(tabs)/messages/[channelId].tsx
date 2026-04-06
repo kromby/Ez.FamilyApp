@@ -1,5 +1,4 @@
-import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
-import * as Location from 'expo-location';
+import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   View, Text, StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator,
 } from 'react-native';
@@ -56,18 +55,32 @@ export default function MessageThreadScreen() {
     enabled: !!token && !!channelId,
   });
 
-  // Flatten pages into single message array (newest first, since API returns DESC)
+  const listRef = useRef<FlashList<Message>>(null);
+
+  // Flatten pages into single message array, reversed to oldest-first for non-inverted list
   const messages = useMemo(() => {
     if (!data?.pages) return [];
-    return data.pages.flatMap((page) => page.messages);
+    const all = data.pages.flatMap((page) => page.messages);
+    return [...all].reverse(); // oldest first
   }, [data]);
 
-  // Determine sender grouping
+  // Auto-scroll to bottom when new messages arrive
+  const prevMessageCount = useRef(0);
+  useMemo(() => {
+    if (messages.length > prevMessageCount.current && prevMessageCount.current > 0) {
+      // New message added — scroll to end after render
+      setTimeout(() => {
+        listRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    }
+    prevMessageCount.current = messages.length;
+  }, [messages.length]);
+
+  // Determine sender grouping (oldest-first: previous message is index-1)
   const getIsFirstInGroup = useCallback((index: number): boolean => {
-    if (index === messages.length - 1) return true; // oldest message = always first
-    // FlashList inverted: index 0 is newest. "Previous" message visually above is index+1
+    if (index === 0) return true; // first message = always show name
     const current = messages[index];
-    const previous = messages[index + 1];
+    const previous = messages[index - 1];
     if (!previous) return true;
     if (current.senderId !== previous.senderId) return true;
     const currentTime = new Date(current.createdAt).getTime();
@@ -77,17 +90,17 @@ export default function MessageThreadScreen() {
 
   // Send message mutation with optimistic update (D-10, Pitfall 3 from RESEARCH.md)
   const sendMutation = useMutation({
-    mutationFn: ({ text, coords }: { text: string; coords: { latitude: number; longitude: number } | null }) =>
-      sendMessage(token!, channelId!, text, coords),
-    onMutate: async ({ text }) => {
+    mutationFn: (text: string) => sendMessage(token!, channelId!, text),
+    onMutate: async (text) => {
+      if (!user) return;
       await queryClient.cancelQueries({ queryKey: ['messages', channelId] });
       const previousData = queryClient.getQueryData(['messages', channelId]);
 
       const optimisticMessage: Message = {
         id: `temp-${Date.now()}`,
         channelId: channelId!,
-        senderId: user!.id,
-        senderName: user!.displayName,
+        senderId: user.id,
+        senderName: user.displayName,
         text,
         createdAt: new Date().toISOString(),
         reactions: [],
@@ -109,7 +122,7 @@ export default function MessageThreadScreen() {
 
       return { previousData };
     },
-    onError: (_err, _vars, context) => {
+    onError: (_err, _text, context) => {
       // Mark as error instead of rolling back (so user sees the failed message)
       queryClient.setQueryData(['messages', channelId], (old: any) => {
         if (!old?.pages) return context?.previousData;
@@ -130,22 +143,8 @@ export default function MessageThreadScreen() {
     },
   });
 
-  const handleSend = useCallback(async (text: string) => {
-    // D-10: Silent location capture — non-blocking, best-effort
-    let coords: { latitude: number; longitude: number } | null = null;
-    try {
-      const { status } = await Location.getForegroundPermissionsAsync();
-      if (status === 'granted') {
-        const loc = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Balanced,
-        });
-        coords = { latitude: loc.coords.latitude, longitude: loc.coords.longitude };
-      }
-    } catch (err) {
-      // D-08: Silent fallback — GPS failure does not block message send
-      console.warn('Location capture failed, sending without coordinates:', err);
-    }
-    sendMutation.mutate({ text, coords });
+  const handleSend = useCallback((text: string) => {
+    sendMutation.mutate(text);
   }, [sendMutation]);
 
   const handleToggleReaction = useCallback(async (messageId: string, emoji: string) => {
@@ -179,7 +178,7 @@ export default function MessageThreadScreen() {
     >
       <ReactionChips
         reactions={item.reactions || []}
-        currentUserId={user!.id}
+        currentUserId={user?.id ?? ''}
         onToggle={(emoji) => handleToggleReaction(item.id, emoji)}
       />
     </MessageBubble>
@@ -222,18 +221,24 @@ export default function MessageThreadScreen() {
         </View>
       ) : (
         <FlashList
+          ref={listRef}
           data={messages}
           renderItem={renderItem}
           estimatedItemSize={60}
           keyExtractor={(item) => item.id}
-          inverted
-          onEndReached={handleEndReached}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={
+          onStartReached={handleEndReached}
+          onStartReachedThreshold={0.5}
+          ListHeaderComponent={
             isFetchingNextPage ? (
               <ActivityIndicator style={{ padding: Spacing.md }} color={colors.accent} size="small" />
             ) : null
           }
+          onContentSizeChange={() => {
+            // Scroll to bottom on initial load
+            if (messages.length > 0 && prevMessageCount.current <= messages.length) {
+              listRef.current?.scrollToEnd({ animated: false });
+            }
+          }}
         />
       )}
 
