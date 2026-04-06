@@ -9,7 +9,7 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { useSession } from '../stores/session';
 import { useMessagingStore } from '../stores/messaging';
-import { joinSignalRChannels, Message } from '../lib/api';
+import { joinSignalRChannels, Message, Task } from '../lib/api';
 
 export function useSignalR() {
   const { session: token } = useSession();
@@ -88,6 +88,37 @@ export function useSignalR() {
     );
   }, [queryClient]);
 
+  const handleTaskAdded = useCallback((task: Task) => {
+    queryClient.setQueryData(['tasks'], (old: { tasks: Task[] } | undefined) => {
+      if (!old) return { tasks: [task] };
+      const exists = old.tasks.some(
+        (t) => t.id === task.id || (t.id.startsWith('temp-') && t.addedById === task.addedById && t.name === task.name)
+      );
+      if (exists) {
+        return {
+          tasks: old.tasks.map((t) =>
+            t.id.startsWith('temp-') && t.addedById === task.addedById && t.name === task.name ? task : t
+          ),
+        };
+      }
+      return { tasks: [task, ...old.tasks] };
+    });
+  }, [queryClient]);
+
+  const handleTaskUpdated = useCallback((task: Task) => {
+    queryClient.setQueryData(['tasks'], (old: { tasks: Task[] } | undefined) => {
+      if (!old) return old;
+      return { tasks: old.tasks.map((t) => (t.id === task.id ? task : t)) };
+    });
+  }, [queryClient]);
+
+  const handleTaskDeleted = useCallback((payload: { taskId: string }) => {
+    queryClient.setQueryData(['tasks'], (old: { tasks: Task[] } | undefined) => {
+      if (!old) return old;
+      return { tasks: old.tasks.filter((t) => t.id !== payload.taskId) };
+    });
+  }, [queryClient]);
+
   useEffect(() => {
     if (!token) return;
 
@@ -111,6 +142,9 @@ export function useSignalR() {
         // Register event handlers
         connection.on('ReceiveMessage', handleReceiveMessage);
         connection.on('ReceiveReaction', handleReceiveReaction);
+        connection.on('TaskAdded', handleTaskAdded);
+        connection.on('TaskUpdated', handleTaskUpdated);
+        connection.on('TaskDeleted', handleTaskDeleted);
 
         connection.onreconnecting(() => setConnectionStatus('reconnecting'));
         connection.onreconnected(async () => {
@@ -161,7 +195,7 @@ export function useSignalR() {
         connectionRef.current = null;
       }
     };
-  }, [token, handleReceiveMessage, handleReceiveReaction, joinChannels, setConnectionStatus]);
+  }, [token, handleReceiveMessage, handleReceiveReaction, handleTaskAdded, handleTaskUpdated, handleTaskDeleted, joinChannels, setConnectionStatus]);
 
   return { connectionRef };
 }
