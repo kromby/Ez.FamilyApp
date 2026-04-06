@@ -88,7 +88,13 @@ Plans:
   2. User can add a task by typing a name and tapping add — it appears immediately for all family members
   3. User can tap a task to check it off and the completed state is visible to all family members
   4. User can delete a task and it disappears for all family members
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — Tasks table DDL + Express CRUD router + SignalR broadcast functions + group join
+- [ ] 04-02-PLAN.md — Task list screen + components + TanStack Query hooks + SignalR real-time sync
+
+**UI hint**: yes
 
 ### Phase 5: Home Screen
 **Goal**: Family dashboard with recent activity, member overview, and quick actions
@@ -111,5 +117,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Foundation | 4/4 | Complete |  |
 | 2. Messaging | 5/5 | Complete |  |
 | 3. Location | 3/3 | Complete |  |
-| 4. Tasks | 0/? | Not started | - |
+| 4. Tasks | 0/2 | Planning complete | - |
 | 5. Home Screen | 0/? | Not started | - |
