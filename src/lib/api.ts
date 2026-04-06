@@ -133,6 +133,45 @@ export async function toggleReaction(
   });
 }
 
+// Task types
+export interface Task {
+  id: string;
+  familyId: string;
+  name: string;
+  addedById: string;
+  addedByName: string;
+  completedAt: string | null;
+  completedById: string | null;
+  completedByName: string | null;
+  createdAt: string;
+}
+
+export async function fetchTasks(token: string): Promise<{ tasks: Task[] }> {
+  return apiFetch('/tasks', token);
+}
+
+export async function addTask(token: string, name: string): Promise<{ task: Task }> {
+  return apiFetch('/tasks', token, {
+    method: 'POST',
+    body: JSON.stringify({ name }),
+  });
+}
+
+export async function toggleTask(
+  token: string,
+  taskId: string,
+  completed: boolean
+): Promise<{ task: Task }> {
+  return apiFetch(`/tasks/${taskId}`, token, {
+    method: 'PATCH',
+    body: JSON.stringify({ completed }),
+  });
+}
+
+export async function deleteTask(token: string, taskId: string): Promise<void> {
+  await apiFetch(`/tasks/${taskId}`, token, { method: 'DELETE' });
+}
+
 // SignalR API
 export async function negotiateSignalR(
   token: string

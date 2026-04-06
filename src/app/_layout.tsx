@@ -1,3 +1,5 @@
+import 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
@@ -41,10 +43,12 @@ function RootNavigator() {
 
 export default function Layout() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <SessionProvider>
-        <RootNavigator />
-      </SessionProvider>
-    </QueryClientProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <QueryClientProvider client={queryClient}>
+        <SessionProvider>
+          <RootNavigator />
+        </SessionProvider>
+      </QueryClientProvider>
+    </GestureHandlerRootView>
   );
 }
