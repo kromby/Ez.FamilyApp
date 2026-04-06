@@ -2,7 +2,7 @@
 
 ## Overview
 
-Four phases from zero to a working family app. Phase 1 stands up the Azure backend, the navigation shell, and the auth flow — nothing else is possible without it. Phase 2 delivers the core communication feature (channel messaging with real-time delivery via Azure SignalR), which carries the highest technical risk and should be validated early. Phase 3 adds passive location capture (hooked into message sending) and last-known-location display. Phase 4 completes the coordination layer with shared task lists. After Phase 4, the family can use the app end-to-end.
+Five phases from zero to a working family app. Phase 1 stands up the Azure backend, the navigation shell, and the auth flow — nothing else is possible without it. Phase 2 delivers the core communication feature (channel messaging with real-time delivery via Azure SignalR), which carries the highest technical risk and should be validated early. Phase 3 adds passive location capture (hooked into message sending) and last-known-location display. Phase 4 completes the coordination layer with shared task lists. Phase 5 builds the Home tab into a family dashboard with recent activity and quick actions. After Phase 5, the family can use the app end-to-end.
 
 ## Phases
 
@@ -16,6 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 2: Messaging** - Channel-based real-time messaging via Azure SignalR with persistence and reactions
 - [ ] **Phase 3: Location** - Passive location capture on message send and last-known-location display per member
 - [ ] **Phase 4: Tasks** - Shared family task list with add, check-off, delete, and real-time sync
+- [ ] **Phase 5: Home Screen** - Family dashboard with recent activity, member overview, and quick actions
 
 ## Phase Details
 
@@ -89,14 +90,26 @@ Plans:
   4. User can delete a task and it disappears for all family members
 **Plans**: TBD
 
+### Phase 5: Home Screen
+**Goal**: Family dashboard with recent activity, member overview, and quick actions
+**Depends on**: Phase 4
+**Requirements**: TBD
+**Success Criteria** (what must be TRUE):
+  1. User opens the app and sees a Home tab with a family overview
+  2. Home screen shows recent activity across channels, tasks, and location
+  3. User can quickly navigate to key areas from the Home screen
+**Plans**: TBD
+**UI hint**: yes
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete |  |
 | 2. Messaging | 5/5 | Complete |  |
-| 3. Location | 0/3 | Not started | - |
+| 3. Location | 3/3 | Complete |  |
 | 4. Tasks | 0/? | Not started | - |
+| 5. Home Screen | 0/? | Not started | - |
