@@ -72,9 +72,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — Install deps + DB schema + backend endpoints + API client
-- [ ] 03-02-PLAN.md — Permission hook + modal + GPS capture on message send
-- [ ] 03-03-PLAN.md — Location tab UI + profile toggle + MessageBubble pin icon
+- [x] 03-01-PLAN.md — Install deps + DB schema + backend endpoints + API client
+- [x] 03-02-PLAN.md — Permission hook + modal + GPS capture on message send
+- [x] 03-03-PLAN.md — Location tab UI + profile toggle + MessageBubble pin icon
 
 **UI hint**: yes
 
