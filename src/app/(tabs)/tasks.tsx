@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useHeaderHeight } from '@react-navigation/elements';
 import { useThemeColors, Spacing, Typography } from '../../constants/theme';
 import { useSession } from '../../stores/session';
 import { useTasks, useAddTask, useToggleTask, useDeleteTask } from '../../hooks/useTasks';
@@ -21,6 +22,7 @@ import AddTaskBar from '../../components/tasks/AddTaskBar';
 export default function TasksScreen() {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
+  const headerHeight = useHeaderHeight();
   const { user } = useSession();
   const { tasks, isLoading, refetch } = useTasks();
   const addTaskMutation = useAddTask();
@@ -144,7 +146,7 @@ export default function TasksScreen() {
     <KeyboardAvoidingView
       style={styles.outer}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 88 : 0}
+      keyboardVerticalOffset={headerHeight}
     >
       {hasNoTasks ? (
         <View style={styles.emptyContainer}>

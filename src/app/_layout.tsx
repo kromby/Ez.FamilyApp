@@ -5,6 +5,8 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SessionProvider, useSession } from '../stores/session';
+import { useLocationPermission } from '../hooks/useLocationPermission';
+import { LocationPermissionModal } from '../components/location/LocationPermissionModal';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -14,6 +16,7 @@ function RootNavigator() {
   const { session, isLoading } = useSession();
   const segments = useSegments();
   const router = useRouter();
+  const { shouldShowModal, requestPermission, dismissModal } = useLocationPermission();
 
   useEffect(() => {
     if (!isLoading) {
@@ -34,10 +37,19 @@ function RootNavigator() {
   }, [session, isLoading, segments]);
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="(auth)" />
-    </Stack>
+    <>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="(auth)" />
+      </Stack>
+      {session && (
+        <LocationPermissionModal
+          visible={shouldShowModal}
+          onAllow={requestPermission}
+          onDismiss={dismissModal}
+        />
+      )}
+    </>
   );
 }
 

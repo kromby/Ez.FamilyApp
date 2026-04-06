@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, Platform, StyleSheet } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import { View, Text, StyleSheet } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -9,16 +8,13 @@ import Animated, {
 import { useThemeColors, Spacing, Typography } from '../../constants/theme';
 
 export function timeAgo(dateStr: string): string {
-  const now = Date.now();
-  const then = new Date(dateStr).getTime();
-  const diffMs = now - then;
+  const diffMs = Date.now() - new Date(dateStr).getTime();
   const minutes = Math.floor(diffMs / 60000);
   if (minutes < 1) return 'just now';
   if (minutes < 60) return `${minutes}m ago`;
   const hours = Math.floor(minutes / 60);
   if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
+  return `${Math.floor(hours / 24)}d ago`;
 }
 
 interface MapCardProps {
@@ -42,7 +38,7 @@ export function MapCard({
   const height = useSharedValue(0);
 
   useEffect(() => {
-    height.value = withTiming(expanded ? 200 : 0, { duration: 250 });
+    height.value = withTiming(expanded ? 120 : 0, { duration: 250 });
   }, [expanded]);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -50,7 +46,8 @@ export function MapCard({
     overflow: 'hidden',
   }));
 
-  const relativeTime = timeAgo(updatedAt);
+  const minutes = Math.floor((Date.now() - new Date(updatedAt).getTime()) / 60000);
+  const relativeTime = minutes < 1 ? 'just now' : minutes < 60 ? `${minutes}m ago` : minutes < 1440 ? `${Math.floor(minutes / 60)}h ago` : `${Math.floor(minutes / 1440)}d ago`;
 
   return (
     <Animated.View style={animatedStyle}>
@@ -58,23 +55,11 @@ export function MapCard({
         style={[styles.container, { backgroundColor: colors.surface }]}
         accessibilityLabel={`${memberName}'s last known location, ${address ?? 'Unknown address'}, ${relativeTime}`}
       >
-        <MapView
-          provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
-          region={{
-            latitude,
-            longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          }}
-          scrollEnabled={false}
-          zoomEnabled={false}
-          style={styles.map}
-        >
-          <Marker
-            coordinate={{ latitude, longitude }}
-            pinColor={colors.accent}
-          />
-        </MapView>
+        <View style={[styles.mapPlaceholder, { backgroundColor: colors.background }]}>
+          <Text style={[Typography.label, { color: colors.textSecondary }]}>
+            Map not available on web
+          </Text>
+        </View>
         <View style={styles.textArea}>
           <Text style={[Typography.body, { color: colors.textPrimary }]}>
             {address ?? 'Unknown address'}
@@ -95,9 +80,11 @@ const styles = StyleSheet.create({
     marginTop: Spacing.sm,
     overflow: 'hidden',
   },
-  map: {
+  mapPlaceholder: {
     width: '100%',
-    height: 150,
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   textArea: {
     padding: Spacing.md,

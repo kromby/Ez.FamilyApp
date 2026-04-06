@@ -211,8 +211,8 @@ export default function MessageThreadScreen() {
   return (
     <KeyboardAvoidingView
       style={[styles.container, { backgroundColor: colors.background }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 88 : 0}
+      behavior="padding"
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 88 : 80}
     >
       {/* Connection status banner */}
       {(connectionStatus === 'reconnecting' || connectionStatus === 'disconnected') && (

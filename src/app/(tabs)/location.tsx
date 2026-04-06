@@ -22,6 +22,7 @@ export default function LocationScreen() {
   const { session: token, user } = useSession();
   const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
   const [permStatus, setPermStatus] = useState<string>('undetermined');
+  const [addresses, setAddresses] = useState<Record<string, string>>({});
 
   useEffect(() => {
     navigation.setOptions({ title: 'Family locations' });
@@ -39,7 +40,34 @@ export default function LocationScreen() {
     enabled: !!token && !!user?.familyId,
   });
 
-  const currentMember = data?.members?.find((m) => m.userId === user?.id);
+  // Reverse-geocode addresses for members that have coordinates but no address
+  useEffect(() => {
+    if (!data?.members) return;
+    data.members.forEach(async (m) => {
+      if (m.latitude == null || m.longitude == null) return;
+      if (m.address || addresses[m.userId]) return;
+      try {
+        const [geo] = await Location.reverseGeocodeAsync({
+          latitude: m.latitude,
+          longitude: m.longitude,
+        });
+        if (geo) {
+          const parts = [geo.street, geo.city, geo.region].filter(Boolean);
+          setAddresses((prev) => ({ ...prev, [m.userId]: parts.join(', ') || 'Unknown address' }));
+        }
+      } catch {
+        // silent — leave as Unknown address
+      }
+    });
+  }, [data?.members]);
+
+  // Enrich members with geocoded addresses
+  const enrichedMembers: MemberLocation[] = (data?.members ?? []).map((m) => ({
+    ...m,
+    address: m.address || addresses[m.userId] || null,
+  }));
+
+  const currentMember = enrichedMembers.find((m) => m.userId === user?.id);
   const showToggleBanner = !!(currentMember && !currentMember.shareLocation);
   const showPermBanner = permStatus === 'denied' && currentMember?.shareLocation !== false;
 
@@ -83,8 +111,6 @@ export default function LocationScreen() {
     );
   }
 
-  const members: MemberLocation[] = data?.members ?? [];
-
   return (
     <View style={styles.container}>
       {showToggleBanner && <LocationWarningBanner type="toggle-off" />}
@@ -92,7 +118,7 @@ export default function LocationScreen() {
         <LocationWarningBanner type="permission-denied" />
       )}
       <FlatList
-        data={members}
+        data={enrichedMembers}
         keyExtractor={(item) => item.userId}
         renderItem={({ item }) => (
           <MemberLocationRow
