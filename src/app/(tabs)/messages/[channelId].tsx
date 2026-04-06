@@ -1,4 +1,5 @@
 import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
+import * as Location from 'expo-location';
 import {
   View, Text, StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator,
 } from 'react-native';
@@ -76,8 +77,9 @@ export default function MessageThreadScreen() {
 
   // Send message mutation with optimistic update (D-10, Pitfall 3 from RESEARCH.md)
   const sendMutation = useMutation({
-    mutationFn: (text: string) => sendMessage(token!, channelId!, text),
-    onMutate: async (text) => {
+    mutationFn: ({ text, coords }: { text: string; coords: { latitude: number; longitude: number } | null }) =>
+      sendMessage(token!, channelId!, text, coords),
+    onMutate: async ({ text }) => {
       await queryClient.cancelQueries({ queryKey: ['messages', channelId] });
       const previousData = queryClient.getQueryData(['messages', channelId]);
 
@@ -107,7 +109,7 @@ export default function MessageThreadScreen() {
 
       return { previousData };
     },
-    onError: (_err, _text, context) => {
+    onError: (_err, _vars, context) => {
       // Mark as error instead of rolling back (so user sees the failed message)
       queryClient.setQueryData(['messages', channelId], (old: any) => {
         if (!old?.pages) return context?.previousData;
@@ -128,8 +130,22 @@ export default function MessageThreadScreen() {
     },
   });
 
-  const handleSend = useCallback((text: string) => {
-    sendMutation.mutate(text);
+  const handleSend = useCallback(async (text: string) => {
+    // D-10: Silent location capture — non-blocking, best-effort
+    let coords: { latitude: number; longitude: number } | null = null;
+    try {
+      const { status } = await Location.getForegroundPermissionsAsync();
+      if (status === 'granted') {
+        const loc = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Balanced,
+        });
+        coords = { latitude: loc.coords.latitude, longitude: loc.coords.longitude };
+      }
+    } catch (err) {
+      // D-08: Silent fallback — GPS failure does not block message send
+      console.warn('Location capture failed, sending without coordinates:', err);
+    }
+    sendMutation.mutate({ text, coords });
   }, [sendMutation]);
 
   const handleToggleReaction = useCallback(async (messageId: string, emoji: string) => {
