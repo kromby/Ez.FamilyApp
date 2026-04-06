@@ -91,8 +91,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — Tasks table DDL + Express CRUD router + SignalR broadcast functions + group join
-- [ ] 04-02-PLAN.md — Task list screen + components + TanStack Query hooks + SignalR real-time sync
+- [x] 04-01-PLAN.md — Tasks table DDL + Express CRUD router + SignalR broadcast functions + group join
+- [x] 04-02-PLAN.md — Task list screen + components + TanStack Query hooks + SignalR real-time sync
 
 **UI hint**: yes
 
