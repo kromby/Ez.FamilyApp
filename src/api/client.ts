@@ -35,7 +35,7 @@ export async function verifyOtp(
 export async function createFamily(
   name: string,
   token: string
-): Promise<{ familyId: string; code: string }> {
+): Promise<{ familyId: string; code: string; token: string }> {
   return post('/families', { name }, token);
 }
 
@@ -54,6 +54,7 @@ export async function setDisplayName(
   displayName: string;
   familyId: string;
   familyName: string;
+  token: string;
 }> {
   return post('/users', { displayName, familyId }, token);
 }

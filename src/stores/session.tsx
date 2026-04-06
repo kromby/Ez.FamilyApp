@@ -1,6 +1,22 @@
 import React, { createContext, useContext, useEffect } from 'react';
+import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { create } from 'zustand';
+
+const storage = {
+  getItem: async (key: string): Promise<string | null> => {
+    if (Platform.OS === 'web') return localStorage.getItem(key);
+    return await SecureStore.getItemAsync(key);
+  },
+  setItem: async (key: string, value: string): Promise<void> => {
+    if (Platform.OS === 'web') { localStorage.setItem(key, value); return; }
+    await SecureStore.setItemAsync(key, value);
+  },
+  deleteItem: async (key: string): Promise<void> => {
+    if (Platform.OS === 'web') { localStorage.removeItem(key); return; }
+    await SecureStore.deleteItemAsync(key);
+  },
+};
 
 const TOKEN_KEY = 'auth_token';
 const USER_KEY = 'user_data';
@@ -26,18 +42,18 @@ export const useSessionStore = create<SessionState>((set) => ({
   user: null,
   isLoading: true,
   signIn: async (token, user) => {
-    await SecureStore.setItemAsync(TOKEN_KEY, token);
-    await SecureStore.setItemAsync(USER_KEY, JSON.stringify(user));
+    await storage.setItem(TOKEN_KEY, token);
+    await storage.setItem(USER_KEY, JSON.stringify(user));
     set({ token, user });
   },
   signOut: async () => {
-    await SecureStore.deleteItemAsync(TOKEN_KEY);
-    await SecureStore.deleteItemAsync(USER_KEY);
+    await storage.deleteItem(TOKEN_KEY);
+    await storage.deleteItem(USER_KEY);
     set({ token: null, user: null });
   },
   hydrate: async () => {
-    const token = await SecureStore.getItemAsync(TOKEN_KEY);
-    const userRaw = await SecureStore.getItemAsync(USER_KEY);
+    const token = await storage.getItem(TOKEN_KEY);
+    const userRaw = await storage.getItem(USER_KEY);
     const user = userRaw ? (JSON.parse(userRaw) as User) : null;
     set({ token, user, isLoading: false });
   },

@@ -12,9 +12,10 @@ import { locationsRouter } from './routes/locations';
 import { getPool } from './db/connection';
 
 const app = express();
-app.use(helmet());
-app.use(cors());
+app.use(cors({ origin: true, credentials: true }));
+app.use(helmet({ crossOriginResourcePolicy: false, crossOriginOpenerPolicy: false }));
 app.use(express.json());
+app.disable('etag');
 
 app.use('/auth', authRouter);
 app.use('/families', familiesRouter);

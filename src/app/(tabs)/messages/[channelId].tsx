@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Ionicons } from '@expo/vector-icons';
+import * as Location from 'expo-location';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSession } from '../../../stores/session';
@@ -88,9 +89,25 @@ export default function MessageThreadScreen() {
     return Math.abs(currentTime - previousTime) > GROUPING_THRESHOLD_MS;
   }, [messages]);
 
+  // Silently grab GPS coordinates for location capture (LOC-01, D-10)
+  const getCoords = useCallback(async () => {
+    try {
+      const { status } = await Location.getForegroundPermissionsAsync();
+      if (status !== 'granted') return null;
+      const loc = await Location.getLastKnownPositionAsync() ??
+        await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+      return loc ? { latitude: loc.coords.latitude, longitude: loc.coords.longitude } : null;
+    } catch {
+      return null; // silent fallback — message sends without location (D-08)
+    }
+  }, []);
+
   // Send message mutation with optimistic update (D-10, Pitfall 3 from RESEARCH.md)
   const sendMutation = useMutation({
-    mutationFn: (text: string) => sendMessage(token!, channelId!, text),
+    mutationFn: async (text: string) => {
+      const coords = await getCoords();
+      return sendMessage(token!, channelId!, text, coords);
+    },
     onMutate: async (text) => {
       if (!user) return;
       await queryClient.cancelQueries({ queryKey: ['messages', channelId] });

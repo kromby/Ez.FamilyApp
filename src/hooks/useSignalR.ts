@@ -9,7 +9,7 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { useSession } from '../stores/session';
 import { useMessagingStore } from '../stores/messaging';
-import { negotiateSignalR, joinSignalRChannels, Message } from '../lib/api';
+import { joinSignalRChannels, Message } from '../lib/api';
 
 export function useSignalR() {
   const { session: token } = useSession();
@@ -97,11 +97,13 @@ export function useSignalR() {
       try {
         setConnectionStatus('connecting');
 
-        // Get negotiate payload from our API
-        const { url, accessToken } = await negotiateSignalR(token!);
+        // Serverless mode: connect via backend negotiate endpoint
+        const apiBase = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
 
         connection = new HubConnectionBuilder()
-          .withUrl(url, { accessTokenFactory: () => accessToken })
+          .withUrl(`${apiBase}/signalr`, {
+            accessTokenFactory: () => token!,
+          })
           .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
           .configureLogging(LogLevel.Warning)
           .build();

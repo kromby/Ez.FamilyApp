@@ -43,11 +43,11 @@ export default function VerifyOtpScreen() {
       const { token } = await verifyOtp(email, otp);
 
       if (intent === 'create') {
-        const { familyId, code } = await createFamily(familyName!, token);
+        const { familyId, code, token: newToken } = await createFamily(familyName!, token);
         router.push({
           pathname: '/(auth)/set-name',
           params: {
-            token,
+            token: newToken ?? token,
             familyId,
             familyName: familyName!,
             intent: 'create',

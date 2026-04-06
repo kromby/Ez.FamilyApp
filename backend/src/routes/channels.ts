@@ -8,6 +8,7 @@ export const channelsRouter = Router();
 // GET /channels — list family channels (name + last message snippet + timestamp)
 channelsRouter.get('/', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
+    console.log('GET /channels — userId:', req.userId, 'familyId:', req.familyId);
     const pool = await getPool();
     const result = await pool.request()
       .input('familyId', sql.UniqueIdentifier, req.familyId)

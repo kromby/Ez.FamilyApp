@@ -22,7 +22,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **MSG-04**: User can see messages from other family members in real-time
 - [x] **MSG-05**: Message history persists and loads when opening a channel
 - [x] **MSG-06**: Messages display sender name and timestamp
-- [ ] **MSG-07**: User can react to a message with an emoji
+- [x] **MSG-07**: User can react to a message with an emoji
 
 ### Tasks
 
@@ -103,7 +103,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MSG-04 | Phase 2 | Complete |
 | MSG-05 | Phase 2 | Complete |
 | MSG-06 | Phase 2 | Complete |
-| MSG-07 | Phase 2 | Pending |
+| MSG-07 | Phase 2 | Complete |
 | LOC-01 | Phase 3 | Pending |
 | LOC-02 | Phase 3 | Pending |
 | LOC-03 | Phase 3 | Pending |

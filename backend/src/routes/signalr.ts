@@ -7,12 +7,25 @@ import { generateNegotiatePayload, addUserToGroup } from '../lib/signalr';
 export const signalrRouter = Router();
 
 // POST /signalr/negotiate — client calls this to get SignalR connection URL + token
+// Also handle GET (some SignalR client versions use GET for negotiate)
 signalrRouter.post('/negotiate', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
+    console.log('POST /signalr/negotiate — userId:', req.userId);
     const payload = generateNegotiatePayload(req.userId!);
     res.json(payload);
   } catch (err) {
     console.error('POST /signalr/negotiate error:', err);
+    res.status(500).json({ error: 'Failed to negotiate SignalR connection' });
+  }
+});
+
+signalrRouter.get('/negotiate', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    console.log('GET /signalr/negotiate — userId:', req.userId);
+    const payload = generateNegotiatePayload(req.userId!);
+    res.json(payload);
+  } catch (err) {
+    console.error('GET /signalr/negotiate error:', err);
     res.status(500).json({ error: 'Failed to negotiate SignalR connection' });
   }
 });

@@ -1,7 +1,23 @@
 import jwt from 'jsonwebtoken';
 
-const endpoint = process.env.AZURE_SIGNALR_ENDPOINT || '';
-const accessKey = process.env.AZURE_SIGNALR_ACCESS_KEY || '';
+// Parse connection string or use individual env vars
+function parseSignalRConfig() {
+  const connStr = process.env.AZURE_SIGNALR_CONNECTION_STRING || '';
+  if (connStr) {
+    const endpointMatch = connStr.match(/Endpoint=(https?:\/\/[^;]+)/i);
+    const keyMatch = connStr.match(/AccessKey=([^;]+)/i);
+    return {
+      endpoint: endpointMatch?.[1]?.replace(/\/$/, '') || '',
+      accessKey: keyMatch?.[1] || '',
+    };
+  }
+  return {
+    endpoint: process.env.AZURE_SIGNALR_ENDPOINT || '',
+    accessKey: process.env.AZURE_SIGNALR_ACCESS_KEY || '',
+  };
+}
+
+const { endpoint, accessKey } = parseSignalRConfig();
 const hub = 'familyhub';
 
 function generateSignalRJwt(targetUrl: string): string {

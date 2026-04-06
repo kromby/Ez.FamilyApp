@@ -1,5 +1,6 @@
 import { Router, Response } from 'express';
 import sql from 'mssql';
+import jwt from 'jsonwebtoken';
 import { getPool } from '../db/connection';
 import { authenticate, AuthRequest } from '../middleware/authenticate';
 
@@ -42,11 +43,20 @@ usersRouter.post('/', authenticate, async (req: AuthRequest, res: Response): Pro
     }
 
     const user = result.recordset[0];
+
+    // Re-issue JWT with updated familyId
+    const newToken = jwt.sign(
+      { userId: req.userId, familyId: user.family_id },
+      process.env.JWT_SECRET!,
+      { expiresIn: '90d' }
+    );
+
     res.json({
       id: user.id,
       displayName: user.display_name,
       familyId: user.family_id ?? null,
       familyName: user.family_name ?? null,
+      token: newToken,
     });
   } catch (err) {
     console.error('POST /users error:', err);

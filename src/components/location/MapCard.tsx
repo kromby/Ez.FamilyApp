@@ -1,6 +1,16 @@
 import React, { useEffect } from 'react';
 import { View, Text, Platform, StyleSheet } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+
+// react-native-maps is native-only — lazy import to avoid web bundler crash
+const MapView = Platform.OS !== 'web'
+  ? require('react-native-maps').default
+  : View;
+const Marker = Platform.OS !== 'web'
+  ? require('react-native-maps').Marker
+  : View;
+const PROVIDER_GOOGLE = Platform.OS !== 'web'
+  ? require('react-native-maps').PROVIDER_GOOGLE
+  : undefined;
 import Animated, {
   useSharedValue,
   useAnimatedStyle,

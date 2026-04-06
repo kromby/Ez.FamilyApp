@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import sql from 'mssql';
+import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
 import { getPool } from '../db/connection';
 import { generateFamilyCode } from '../lib/familyCode';
@@ -65,7 +66,14 @@ familiesRouter.post('/', authenticate, async (req: AuthRequest, res: Response): 
         VALUES (@familyId2, 'general', @createdBy)
       `);
 
-    res.json({ familyId, code });
+    // Re-issue JWT with updated familyId
+    const newToken = jwt.sign(
+      { userId: req.userId, familyId },
+      process.env.JWT_SECRET!,
+      { expiresIn: '90d' }
+    );
+
+    res.json({ familyId, code, token: newToken });
   } catch (err) {
     console.error('POST /families error:', err);
     res.status(500).json({ error: 'Failed to create family' });

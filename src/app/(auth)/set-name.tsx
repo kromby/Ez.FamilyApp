@@ -46,6 +46,7 @@ export default function SetNameScreen() {
     setLoading(true);
     try {
       const user = await setDisplayName(displayName.trim(), familyId, token);
+      const freshToken = user.token ?? token;
 
       if (intent === 'create') {
         router.replace({
@@ -53,14 +54,14 @@ export default function SetNameScreen() {
           params: {
             familyCode: familyCode!,
             familyName,
-            token,
+            token: freshToken,
             userId: user.id,
             displayName: user.displayName,
             familyId: user.familyId,
           },
         });
       } else {
-        await signIn(token, {
+        await signIn(freshToken, {
           id: user.id,
           displayName: user.displayName,
           familyId: user.familyId,

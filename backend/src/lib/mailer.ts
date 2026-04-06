@@ -10,6 +10,10 @@ const transporter = nodemailer.createTransport({
 });
 
 export async function sendOtpEmail(to: string, otp: string): Promise<void> {
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`[DEV] OTP for ${to}: ${otp}`);
+    return;
+  }
   await transporter.sendMail({
     from: process.env.SMTP_FROM,
     to,
