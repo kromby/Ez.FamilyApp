@@ -35,7 +35,19 @@
           }
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Your family can see where you last were when you send a message."
+        }
+      ],
+      [
+        "react-native-maps",
+        {
+          "androidGoogleMapsApiKey": "GOOGLE_MAPS_ANDROID_API_KEY"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
