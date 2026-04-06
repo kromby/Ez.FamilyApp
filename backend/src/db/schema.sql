@@ -48,3 +48,21 @@ CREATE TABLE message_reactions (
   created_at  DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
   CONSTRAINT uq_reaction_per_user_message UNIQUE (message_id, user_id, emoji)
 );
+
+-- Phase 3: Location
+-- Run these ALTER statements manually against existing databases
+ALTER TABLE messages ADD latitude FLOAT NULL;
+ALTER TABLE messages ADD longitude FLOAT NULL;
+
+ALTER TABLE users ADD share_location BIT NOT NULL DEFAULT 1;
+
+CREATE TABLE member_locations (
+  user_id      UNIQUEIDENTIFIER PRIMARY KEY REFERENCES users(id),
+  family_id    UNIQUEIDENTIFIER NOT NULL REFERENCES families(id),
+  latitude     FLOAT NOT NULL,
+  longitude    FLOAT NOT NULL,
+  message_id   UNIQUEIDENTIFIER NOT NULL REFERENCES messages(id),
+  address      NVARCHAR(300) NULL,
+  updated_at   DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+  INDEX ix_member_locations_family (family_id)
+);

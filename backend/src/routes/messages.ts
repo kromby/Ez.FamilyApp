@@ -8,11 +8,28 @@ export const messagesRouter = Router();
 
 // POST /messages — send a message (D-09: persist first, then broadcast)
 messagesRouter.post('/', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
-  const { channelId, text } = req.body;
+  const { channelId, text, latitude, longitude } = req.body;
 
   if (!channelId || !text || typeof text !== 'string' || text.trim().length === 0) {
     res.status(400).json({ error: 'channelId and text are required' });
     return;
+  }
+
+  let lat: number | null = null;
+  let lng: number | null = null;
+  if (latitude !== undefined && latitude !== null) {
+    lat = parseFloat(latitude);
+    if (isNaN(lat) || lat < -90 || lat > 90) {
+      res.status(400).json({ error: 'latitude must be between -90 and 90' });
+      return;
+    }
+  }
+  if (longitude !== undefined && longitude !== null) {
+    lng = parseFloat(longitude);
+    if (isNaN(lng) || lng < -180 || lng > 180) {
+      res.status(400).json({ error: 'longitude must be between -180 and 180' });
+      return;
+    }
   }
 
   try {
@@ -34,11 +51,14 @@ messagesRouter.post('/', authenticate, async (req: AuthRequest, res: Response): 
       .input('channelId', sql.UniqueIdentifier, channelId)
       .input('senderId', sql.UniqueIdentifier, req.userId)
       .input('text', sql.NVarChar, text.trim())
+      .input('lat', sql.Float, lat)
+      .input('lng', sql.Float, lng)
       .query(`
-        INSERT INTO messages (channel_id, sender_id, text)
+        INSERT INTO messages (channel_id, sender_id, text, latitude, longitude)
         OUTPUT INSERTED.id, INSERTED.channel_id AS channelId, INSERTED.sender_id AS senderId,
-               INSERTED.text, INSERTED.created_at AS createdAt
-        VALUES (@channelId, @senderId, @text)
+               INSERTED.text, INSERTED.created_at AS createdAt,
+               INSERTED.latitude, INSERTED.longitude
+        VALUES (@channelId, @senderId, @text, @lat, @lng)
       `);
 
     const message = insertResult.recordset[0];
@@ -62,9 +82,28 @@ messagesRouter.post('/', authenticate, async (req: AuthRequest, res: Response): 
 
     const senderName = userResult.recordset[0]?.display_name || 'Unknown';
 
+    // Upsert member_locations if coordinates provided (LOC-01)
+    if (lat !== null && lng !== null) {
+      await pool.request()
+        .input('mlUserId', sql.UniqueIdentifier, req.userId)
+        .input('mlFamilyId', sql.UniqueIdentifier, req.familyId)
+        .input('mlLat', sql.Float, lat)
+        .input('mlLng', sql.Float, lng)
+        .input('mlMsgId', sql.UniqueIdentifier, message.id)
+        .query(`
+          MERGE member_locations AS target
+          USING (SELECT @mlUserId AS user_id, @mlFamilyId AS family_id, @mlLat AS latitude, @mlLng AS longitude, @mlMsgId AS message_id) AS source
+          ON target.user_id = source.user_id
+          WHEN MATCHED THEN UPDATE SET latitude = source.latitude, longitude = source.longitude, message_id = source.message_id, updated_at = GETUTCDATE()
+          WHEN NOT MATCHED THEN INSERT (user_id, family_id, latitude, longitude, message_id, updated_at) VALUES (source.user_id, source.family_id, source.latitude, source.longitude, source.message_id, GETUTCDATE());
+        `);
+    }
+
     const broadcastPayload = {
       ...message,
       senderName,
+      latitude: message.latitude ?? null,
+      longitude: message.longitude ?? null,
       reactions: [],
     };
 
@@ -118,6 +157,7 @@ messagesRouter.get('/', authenticate, async (req: AuthRequest, res: Response): P
         SELECT TOP (@pageSize)
           m.id, m.channel_id AS channelId, m.sender_id AS senderId,
           m.text, m.created_at AS createdAt,
+          m.latitude, m.longitude,
           u.display_name AS senderName
         FROM messages m
         JOIN users u ON m.sender_id = u.id
@@ -131,6 +171,7 @@ messagesRouter.get('/', authenticate, async (req: AuthRequest, res: Response): P
         SELECT TOP (@pageSize)
           m.id, m.channel_id AS channelId, m.sender_id AS senderId,
           m.text, m.created_at AS createdAt,
+          m.latitude, m.longitude,
           u.display_name AS senderName
         FROM messages m
         JOIN users u ON m.sender_id = u.id

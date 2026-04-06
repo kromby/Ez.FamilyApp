@@ -53,3 +53,26 @@ usersRouter.post('/', authenticate, async (req: AuthRequest, res: Response): Pro
     res.status(500).json({ error: 'Failed to update user' });
   }
 });
+
+// PATCH /users/me — update user preferences (D-14: share_location toggle)
+usersRouter.patch('/me', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
+  const { shareLocation } = req.body;
+
+  if (typeof shareLocation !== 'boolean') {
+    res.status(400).json({ error: 'shareLocation must be a boolean' });
+    return;
+  }
+
+  try {
+    const pool = await getPool();
+    await pool.request()
+      .input('userId', sql.UniqueIdentifier, req.userId)
+      .input('shareLocation', sql.Bit, shareLocation ? 1 : 0)
+      .query('UPDATE users SET share_location = @shareLocation WHERE id = @userId');
+
+    res.json({ shareLocation });
+  } catch (err) {
+    console.error('PATCH /users/me error:', err);
+    res.status(500).json({ error: 'Failed to update preferences' });
+  }
+});

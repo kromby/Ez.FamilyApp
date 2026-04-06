@@ -33,6 +33,8 @@ export interface Message {
   senderName: string;
   text: string;
   createdAt: string;
+  latitude?: number | null;
+  longitude?: number | null;
   reactions?: ReactionGroup[];
   status?: 'sending' | 'sent' | 'error';
 }
@@ -76,11 +78,46 @@ export async function fetchMessages(
 export async function sendMessage(
   token: string,
   channelId: string,
-  text: string
+  text: string,
+  coords?: { latitude: number; longitude: number } | null
 ): Promise<{ message: Message }> {
   return apiFetch('/messages', token, {
     method: 'POST',
-    body: JSON.stringify({ channelId, text }),
+    body: JSON.stringify({
+      channelId,
+      text,
+      latitude: coords?.latitude ?? null,
+      longitude: coords?.longitude ?? null,
+    }),
+  });
+}
+
+// Location types
+export interface MemberLocation {
+  userId: string;
+  displayName: string;
+  shareLocation: boolean;
+  latitude: number | null;
+  longitude: number | null;
+  address: string | null;
+  updatedAt: string | null;
+}
+
+// Location API
+export async function fetchMemberLocations(
+  token: string,
+  familyId: string
+): Promise<{ members: MemberLocation[] }> {
+  return apiFetch(`/locations/family/${familyId}/members`, token);
+}
+
+export async function updateShareLocation(
+  token: string,
+  shareLocation: boolean
+): Promise<{ shareLocation: boolean }> {
+  return apiFetch('/users/me', token, {
+    method: 'PATCH',
+    body: JSON.stringify({ shareLocation }),
   });
 }
 

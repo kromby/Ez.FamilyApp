@@ -8,6 +8,7 @@ import { usersRouter } from './routes/users';
 import { channelsRouter } from './routes/channels';
 import { messagesRouter } from './routes/messages';
 import { signalrRouter } from './routes/signalr';
+import { locationsRouter } from './routes/locations';
 import { getPool } from './db/connection';
 
 const app = express();
@@ -21,6 +22,7 @@ app.use('/users', usersRouter);
 app.use('/channels', channelsRouter);
 app.use('/messages', messagesRouter);
 app.use('/signalr', signalrRouter);
+app.use('/locations', locationsRouter);
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
