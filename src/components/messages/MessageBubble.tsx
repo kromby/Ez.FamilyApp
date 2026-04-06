@@ -1,5 +1,7 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Pressable, Modal } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import * as Location from 'expo-location';
 import { useThemeColors, Spacing, Typography } from '../../constants/theme';
 import type { Message } from '../../lib/api';
 
@@ -17,6 +19,24 @@ function formatTime(dateStr: string): string {
 
 export function MessageBubble({ message, isFirstInGroup, onLongPress, children }: Props) {
   const colors = useThemeColors();
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [address, setAddress] = useState<string | null>(null);
+
+  async function handlePinPress() {
+    if (!address && message.latitude != null && message.longitude != null) {
+      try {
+        const [geo] = await Location.reverseGeocodeAsync({
+          latitude: message.latitude,
+          longitude: message.longitude,
+        });
+        const parts = [geo.street, geo.city, geo.region].filter(Boolean);
+        setAddress(parts.join(', ') || 'Unknown location');
+      } catch {
+        setAddress('Unknown location');
+      }
+    }
+    setShowLocationModal(true);
+  }
 
   return (
     <View
@@ -48,8 +68,42 @@ export function MessageBubble({ message, isFirstInGroup, onLongPress, children }
         >
           {message.text}
         </Text>
+        {message.latitude != null && (
+          <Pressable
+            onPress={handlePinPress}
+            accessibilityLabel="Message sent with location"
+            style={{ marginLeft: Spacing.xs, marginTop: 6 }}
+          >
+            <Ionicons name="location" size={12} color={colors.textSecondary} />
+          </Pressable>
+        )}
       </View>
       {children}
+      {showLocationModal && message.latitude != null && (
+        <Modal
+          transparent
+          animationType="fade"
+          visible={showLocationModal}
+          onRequestClose={() => setShowLocationModal(false)}
+        >
+          <Pressable
+            style={modalStyles.backdrop}
+            onPress={() => setShowLocationModal(false)}
+          >
+            <View style={[modalStyles.card, { backgroundColor: colors.background }]}>
+              <Text style={[Typography.label, { fontWeight: '600', color: colors.textSecondary }]}>
+                Sent from
+              </Text>
+              <Text style={[Typography.body, { color: colors.textPrimary, marginTop: Spacing.xs }]}>
+                {address ?? 'Loading...'}
+              </Text>
+              <Text style={[Typography.label, { color: colors.textSecondary, marginTop: Spacing.xs }]}>
+                {formatTime(message.createdAt)}
+              </Text>
+            </View>
+          </Pressable>
+        </Modal>
+      )}
     </View>
   );
 }
@@ -72,5 +126,20 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginRight: Spacing.xs,
     marginTop: 8, // vertically center with first line of text (lineHeight 24 / 2 - 4)
+  },
+});
+
+const modalStyles = StyleSheet.create({
+  backdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  card: {
+    borderRadius: 12,
+    padding: Spacing.md,
+    minWidth: 200,
+    maxWidth: 280,
   },
 });
