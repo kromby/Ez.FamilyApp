@@ -44,7 +44,10 @@ signalrRouter.post('/join-channels', authenticate, async (req: AuthRequest, res:
       channels.map((ch: { id: string }) => addUserToGroup(req.userId!, ch.id))
     );
 
-    res.json({ joined: channels.length });
+    // Also join family-tasks group for real-time task sync
+    await addUserToGroup(req.userId!, `family-tasks-${req.familyId}`);
+
+    res.json({ joined: channels.length, tasksGroup: true });
   } catch (err) {
     console.error('POST /signalr/join-channels error:', err);
     res.status(500).json({ error: 'Failed to join channel groups' });
