@@ -9,6 +9,7 @@ import { channelsRouter } from './routes/channels';
 import { messagesRouter } from './routes/messages';
 import { signalrRouter } from './routes/signalr';
 import { locationsRouter } from './routes/locations';
+import { tasksRouter } from './routes/tasks';
 import { getPool } from './db/connection';
 
 const app = express();
@@ -24,13 +25,14 @@ app.use('/channels', channelsRouter);
 app.use('/messages', messagesRouter);
 app.use('/signalr', signalrRouter);
 app.use('/locations', locationsRouter);
+app.use('/tasks', tasksRouter);
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 getPool().then(() => {
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
 }).catch((err) => {
   console.error('Failed to connect to database', err);
   process.exit(1);

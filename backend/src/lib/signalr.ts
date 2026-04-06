@@ -81,3 +81,27 @@ export async function broadcastReaction(channelId: string, payload: object): Pro
     }),
   });
 }
+
+/** Broadcast a task event to all users in the family-tasks group */
+async function broadcastToFamily(familyId: string, target: string, payload: object): Promise<void> {
+  const groupName = `family-tasks-${familyId}`;
+  const url = `${endpoint}/api/v1/hubs/${hub}/groups/${groupName}`;
+  const token = generateSignalRJwt(url);
+  await fetch(url, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ target, arguments: [payload] }),
+  });
+}
+
+export async function broadcastTaskAdded(familyId: string, task: object): Promise<void> {
+  return broadcastToFamily(familyId, 'TaskAdded', task);
+}
+
+export async function broadcastTaskUpdated(familyId: string, task: object): Promise<void> {
+  return broadcastToFamily(familyId, 'TaskUpdated', task);
+}
+
+export async function broadcastTaskDeleted(familyId: string, taskId: string): Promise<void> {
+  return broadcastToFamily(familyId, 'TaskDeleted', { taskId });
+}

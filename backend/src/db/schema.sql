@@ -49,6 +49,20 @@ CREATE TABLE message_reactions (
   CONSTRAINT uq_reaction_per_user_message UNIQUE (message_id, user_id, emoji)
 );
 
+-- Phase 4: Tasks
+CREATE TABLE tasks (
+  id              UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+  family_id       UNIQUEIDENTIFIER NOT NULL REFERENCES families(id),
+  name            NVARCHAR(200) NOT NULL,
+  added_by_id     UNIQUEIDENTIFIER NOT NULL REFERENCES users(id),
+  added_by_name   NVARCHAR(100) NOT NULL,
+  completed_at    DATETIME2 NULL,
+  completed_by_id UNIQUEIDENTIFIER NULL REFERENCES users(id),
+  completed_by_name NVARCHAR(100) NULL,
+  created_at      DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+  INDEX ix_tasks_family_created (family_id, created_at DESC)
+);
+
 -- Phase 3: Location
 -- Run these ALTER statements manually against existing databases
 ALTER TABLE messages ADD latitude FLOAT NULL;
