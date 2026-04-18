@@ -1,5 +1,5 @@
 {
-  "name": "ez-familyapp",
+  "name": "ez-sveit",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
@@ -11,6 +11,7 @@
     "lint": "expo lint"
   },
   "dependencies": {
+    "@azure/mcp": "^3.0.0-beta.3",
     "@microsoft/signalr": "^10.0.0",
     "@react-navigation/bottom-tabs": "^7.4.0",
     "@react-navigation/elements": "^2.9.10",
