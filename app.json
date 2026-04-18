@@ -4,14 +4,14 @@
     "slug": "ez-sveit",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./brand/logo/sveit-logo-square.png",
     "scheme": "ezsveit",
     "userInterfaceStyle": "automatic",
     "ios": {},
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/icon.png"
+        "backgroundColor": "#F5EEDC",
+        "foregroundImage": "./brand/logo/sveit-logo-square.png"
       },
       "predictiveBackGestureEnabled": false,
       "permissions": [
@@ -28,9 +28,9 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#F5EEDC",
           "android": {
-            "image": "./assets/images/icon.png",
+            "image": "./brand/logo/sveit-logo-square.png",
             "imageWidth": 76
           }
         }
