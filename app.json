@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Sveit",
-    "slug": "ez-sveit",
+    "slug": "ez-familyapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./brand/logo/sveit-logo-square.png",
@@ -52,6 +52,7 @@
       "eas": {
         "projectId": "2c2c6f93-be62-4e77-a07f-0dabf369d845"
       }
-    }
+    },
+    "owner": "kromby"
   }
 }
