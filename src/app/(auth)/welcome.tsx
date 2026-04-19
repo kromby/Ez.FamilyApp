@@ -17,8 +17,8 @@ export default function WelcomeScreen() {
       >
         <View style={styles.hero}>
           <Text style={styles.heading}>Welcome to</Text>
-          <Text style={styles.display}>ez.familyapp</Text>
-          <Text style={styles.subtitle}>Stay connected and coordinated with your family.</Text>
+          <Text style={styles.display}>Sveit</Text>
+          <Text style={styles.subtitle}>Fólkið þitt. Staðurinn þinn.</Text>
         </View>
 
         <View style={styles.buttons}>

@@ -17,7 +17,7 @@ export async function sendOtpEmail(to: string, otp: string): Promise<void> {
   await transporter.sendMail({
     from: process.env.SMTP_FROM,
     to,
-    subject: 'Your family app sign-in code',
+    subject: 'Your Sveit sign-in code',
     text: `Your sign-in code is: ${otp}\n\nThis code expires in 10 minutes.`,
   });
 }
